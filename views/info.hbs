@@ -1,0 +1,20 @@
+<h1>Information</h1>
+
+{{#each recs2}}
+<div class="card mb-3" style="max-width: 1040px; outline: 1px dashed #f520d1;">
+  <div class="row no-gutters">
+    <div class="col-md-4">
+      <img src="{{this.image}}" class="card-img" alt="...">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title">{{this.name}}</h5>
+        <small>Rating: {{this.rating}}</small>
+        <p class="card-text">{{{this.summary}}}</p>
+        <p class="card-text"><a href="{{this.official_site}}" target="_blank">Official Site</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{{/each}}
+<a href="/" class="btn btn-danger btn-lg mt-3">Back to homepage</a>

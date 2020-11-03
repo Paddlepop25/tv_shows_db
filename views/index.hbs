@@ -1,0 +1,21 @@
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each result}}
+    <tr>
+      <td scope="row">
+        <img src="{{this.image}}" alt="" width="60" class="mr-4">
+        {{this.name}}
+        </td>
+      <td>
+        <a href="name/{{this.tvid}}" class="btn btn-success mt-4">More Info</a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
