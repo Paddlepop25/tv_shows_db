@@ -1,3 +1,6 @@
+// not working, look through Chuk codes
+// see which is free variable, which is bound variable
+
 // load express, handlebars, mysql2, dotenv
 const express = require('express')
 const handlebars = require('express-handlebars')
@@ -18,6 +21,24 @@ const SQL_FIND_BY_ID = 'SELECT * FROM tv_shows WHERE tvid=?' //'select * from tv
 // create the database connection pool
 // remember export DB_USER, DB_PASSWORD, DB_NAME
 
+const mkQuery = (sqlStatement, pool) => {
+  const f = async (params) => {
+    // get a connection from the pool
+    const conn = await pool.getConnection()
+
+    try {
+      // Execute the query with the parameter
+      const results = await pool.query(sqlStatement, params)
+      return results[0]
+    } catch(e) {
+      return Promise.reject(e)
+    } finally {
+      conn.release
+    }
+  }
+  return f
+}
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT) || 3306,
@@ -28,26 +49,30 @@ const pool = mysql.createPool({
   timezone: '+8:00',
 })
 
-const startApp = async (app, pool) => {
-  try {
-    // get a connection from the connection pool
-    const conn = await pool.getConnection()
-    console.info('Pinging database')
+// create queries
+const getTVList = mkQuery(SQL_FIND_BY_NAME, pool)
+const getTVShowById = mkQuery(SQL_FIND_BY_ID, pool)
 
-    await conn.ping()
+// const startApp = async (app, pool) => {
+//   try {
+//     // get a connection from the connection pool
+//     const conn = await pool.getConnection()
+//     console.info('Pinging database')
 
-    // release the connection
-    conn.release()
+//     await conn.ping()
 
-    // start the server only if connected to database
-    app.listen(PORT, () => {
-      console.info(`Application started on port ${PORT} at ${new Date()}`)
-    })
+//     // release the connection
+//     conn.release()
 
-  } catch (exception) {
-    console.error('Cannot ping database ---> ', exception)
-  }
-}
+//     // start the server only if connected to database
+//     app.listen(PORT, () => {
+//       console.info(`Application started on port ${PORT} at ${new Date()}`)
+//     })
+
+//   } catch (exception) {
+//     console.error('Cannot ping database ---> ', exception)
+//   }
+// }
 
 // create an instance of express
 const app = express()
@@ -64,7 +89,7 @@ app.get('/',
     const conn = await pool.getConnection()
     try {
       // const SQL_FIND_BY_NAME = 'SELECT * FROM tv_shows ORDER BY ? desc LIMIT ?'
-      const results = await conn.query(SQL_FIND_BY_NAME, [limit])
+      const results = await conn.query(getTVList, [limit])
       const result = results[0]
       // console.info('result --->', result)
 
@@ -84,7 +109,7 @@ app.get('/name/:tvid',
     const conn = await pool.getConnection()
 
     try {
-      const results2 = await conn.query(SQL_FIND_BY_ID, [tvID])
+      const results2 = await conn.query(getTVShowById, [tvID])
       const recs2 = results2[0]
       // console.info('results2 --->', results2)
       // console.info('recs2 --->', recs2)
@@ -102,4 +127,4 @@ app.get('/name/:tvid',
 )
 
 
-startApp(app, pool)  
+// startApp(app, pool)  
