@@ -101,5 +101,6 @@ app.get('/name/:tvid',
   }
 )
 
-
 startApp(app, pool)  
+
+console.info('HEROKU MASTAAAAAAAAA')
